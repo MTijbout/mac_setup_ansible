@@ -1,0 +1,7 @@
+# .gitignore
+.DS_Store
+*.retry
+*.log
+# If you have secrets, ignore them!
+group_vars/all/vault.yml
+tests

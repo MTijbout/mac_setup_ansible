@@ -1,0 +1,11 @@
+- name: Install Homebrew Casks
+  community.general.homebrew_cask:
+    name: "{{ item }}"
+    state: present
+    accept_external_apps: true
+  loop: "{{ homebrew_casks }}"
+
+- name: Install JetBrains Mono Font
+  community.general.homebrew_cask:
+    name: font-jetbrains-mono
+    state: present

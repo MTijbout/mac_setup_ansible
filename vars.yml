@@ -1,0 +1,62 @@
+# vars.yml
+# --- Feature Toggles ---
+setup_ssh: false
+setup_homebrew: true
+setup_vscode: false
+setup_dotfiles: false
+setup_iterm2: false
+setup_espanso: true
+
+# --- Global Config ---
+ssh_key_path: "{{ ansible_facts['env']['HOME'] }}/.ssh/id_github_mtijbout_sparky_user_auth"
+
+# Base directory for all repos
+github_base_dir: "{{ ansible_facts['env']['HOME'] }}/GitHub"
+
+# Repository Destinations (dotfiles repo)
+dotfiles_repo: "git@github.com:MTijbout/dotfiles.git"
+dotfiles_dest: "{{ github_base_dir }}/dotfiles"
+
+configs_repo: "git@github.com:MTijbout/configurations.git"
+configs_dest: "{{ github_base_dir }}/configurations"
+
+# Config Sources (configurations repo)
+
+# VScode
+vscode_config_dir: "{{ ansible_facts['env']['HOME'] }}/Library/Application Support/Code/User"
+vscode_settings_file: "{{ configs_dest }}/vscode/settings.json"
+
+# iTerm2
+iterm_config_dir: "{{ ansible_facts['env']['HOME'] }}/.config/iterm2"
+iterm_config_file: "com.googlecode.iterm2.plist"
+iterm_background_file: "black_paper.jpg"
+iterm_repo_src: "{{ configs_dest }}/iterm2/"
+
+# espanso (Dropbox)
+espanso_dropbox_path: "{{ ansible_facts['env']['HOME'] }}/Dropbox/espanso"
+espanso_macos_config_path: "{{ ansible_facts['env']['HOME'] }}/Library/Application Support/espanso"
+
+
+homebrew_casks: 
+  - espanso
+  - iterm2
+  - visual-studio-code
+  - google-chrome
+  - font-jetbrains-mono
+  - obsidian
+
+vscode_extensions: 
+  - redhat.ansible
+  - ms-python.python
+  - eamodio.gitlens
+  - esbenp.prettier-vscode
+
+dotfiles_to_link: 
+  - .aliases-darwin
+  - .vimrc
+  - .gitconfig
+  - .gitignore_global
+
+iterm_files_to_link: 
+  - com.googlecode.iterm2.plist
+  - black_paper.jpg

@@ -1,0 +1,13 @@
+---
+# collections/requirements.yml
+collections:
+  - name: community.general
+    version: ">=10.0.0"  # Specify a version for consistency
+
+# roles/requirements.yml (if you ever use external roles)
+roles:
+  - src: geerlingguy.dotfiles
+
+
+# To install these on a new machine:
+# ansible-galaxy install -r requirements.yml

@@ -1,0 +1,23 @@
+- name: Install Visual Studio Code extensions
+  ansible.builtin.shell:
+    cmd: "'/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' --install-extension {{ item }}"
+  loop: "{{ vscode_extensions }}"
+  register: vscode_result
+  changed_when: "'successfully installed' in vscode_result.stdout"
+  failed_when: 
+    - vscode_result.rc != 0 
+    - "'already installed' not in vscode_result.stdout"
+
+- name: Ensure VS Code User configuration directory exists
+  ansible.builtin.file:
+    path: "{{ vscode_config_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Symlink VS Code settings.json
+  ansible.builtin.file:
+    # UPDATED: We now use the variable directly since it contains the full path
+    src: "{{ vscode_settings_file }}"
+    dest: "{{ vscode_config_dir }}/settings.json"
+    state: link
+    force: yes

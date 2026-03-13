@@ -1,0 +1,29 @@
+- name: Ensure GitHub directory exists
+  ansible.builtin.file:
+    path: "{{ github_base_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Clone private dotfiles repository
+  ansible.builtin.git:
+    repo: "{{ dotfiles_repo }}"
+    dest: "{{ dotfiles_dest }}"
+    accept_hostkey: yes
+    key_file: "{{ ssh_key_path }}"
+    update: yes
+
+- name: Clone private configurations repository
+  ansible.builtin.git:
+    repo: "{{ configs_repo }}"
+    dest: "{{ configs_dest }}"
+    accept_hostkey: yes
+    key_file: "{{ ssh_key_path }}"
+    update: yes
+
+- name: Symlink dotfiles to Home directory
+  ansible.builtin.file:
+    src: "{{ dotfiles_dest }}/{{ item }}"
+    dest: "{{ ansible_facts['env']['HOME'] }}/{{ item }}"
+    state: link
+    force: yes
+  loop: "{{ dotfiles_to_link }}"

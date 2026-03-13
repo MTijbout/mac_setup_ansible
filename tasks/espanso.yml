@@ -1,0 +1,48 @@
+# ./tasks/espanso.yml
+
+- name: 0. Stop Espanso service before changes
+  ansible.builtin.shell: espanso stop
+  failed_when: false # Don't fail if espanso isn't already running
+  changed_when: false
+
+- name: 1. Check if Dropbox folder is accessible
+  ansible.builtin.stat:
+    path: "{{ espanso_dropbox_path }}"
+  register: dropbox_folder
+
+- name: 2. Verify Dropbox folder exists
+  ansible.builtin.assert:
+    that:
+      - dropbox_folder.stat.exists
+      - dropbox_folder.stat.isdir
+    fail_msg: "Dropbox folder at {{ espanso_dropbox_path }} is missing."
+
+- name: 2b. Check if the local config is already a symlink
+  ansible.builtin.stat:
+    path: "{{ espanso_macos_config_path }}"
+  register: local_config
+
+- name: 2c. Remove existing local config directory if it's NOT a link
+  ansible.builtin.file:
+    path: "{{ espanso_macos_config_path }}"
+    state: absent
+  # Only delete if it exists and is a real directory (not a symlink)
+  when: 
+    - local_config.stat.exists 
+    - not local_config.stat.islnk
+
+- name: 3. Create symbolic link for Espanso config
+  ansible.builtin.file:
+    src: "{{ espanso_dropbox_path }}"
+    dest: "{{ espanso_macos_config_path }}"
+    state: link
+    force: true
+  register: symlink_status
+
+- name: 4. Restart Espanso to apply changes
+  ansible.builtin.shell: espanso start
+  register: espanso_start_result
+  until: espanso_start_result.rc == 0
+  retries: 3
+  delay: 5
+  # The 'until' loop gives you time to click 'OK' on any remaining popups

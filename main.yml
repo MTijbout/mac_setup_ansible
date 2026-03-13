@@ -1,0 +1,35 @@
+---
+# main.yml
+- name: macOS Tahoe Full Setup
+  hosts: localhost
+  connection: local
+  gather_facts: true
+
+  # Link to your separate configuration file
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Run SSH Setup
+      ansible.builtin.include_tasks: tasks/ssh_github.yml
+      when: setup_ssh
+
+    - name: Run Homebrew Installation
+      ansible.builtin.include_tasks: tasks/homebrew.yml
+      when: setup_homebrew
+
+    - name: Run Dotfile Symlinking
+      ansible.builtin.include_tasks: tasks/symlinks_dotfiles.yml
+      when: setup_dotfiles
+
+    - name: Run VS Code Configuration
+      ansible.builtin.include_tasks: tasks/vscode.yml
+      when: setup_vscode
+
+    - name: Run iTerm2 Configuration
+      ansible.builtin.include_tasks: tasks/iterm2.yml
+      when: setup_iterm2
+
+    - name: Run espanso Configuration
+      ansible.builtin.include_tasks: tasks/espanso.yml
+      when: setup_espanso
