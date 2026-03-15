@@ -3,7 +3,9 @@
 setup_ssh: false
 setup_homebrew: false
 setup_vscode: true
-setup_vscode_as_default_md: true      # Requires: setup_vscode: true
+setup_vscode_extensions: true         # Requires: setup_vscode: true
+setup_vscode_file_handling: true      # Requires: setup_vscode: true
+setup_vscode_user_settings: true      # Requires: setup_vscode: true
 setup_dotfiles: false
 setup_iterm2: false
 setup_espanso: false
@@ -62,9 +64,8 @@ iterm_files_to_link:
   - com.googlecode.iterm2.plist
   - black_paper.jpg
 
-vscode_default_handler:
+vscode_file_handling:
   - md
   - public.json # UTI: JSON (more reliable than just 'json')
   - public.yaml # UTI: YAML (more reliable than just 'yaml')
   - yml
-  
