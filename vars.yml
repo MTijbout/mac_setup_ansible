@@ -1,11 +1,13 @@
 # vars.yml
 # --- Feature Toggles ---
-setup_ssh: false
+setup_ssh_github: false
 setup_homebrew: false
 setup_vscode: true
 setup_vscode_extensions: true         # Requires: setup_vscode: true
 setup_vscode_file_handling: true      # Requires: setup_vscode: true
 setup_vscode_user_settings: true      # Requires: setup_vscode: true
+setup_ssh_conf: true
+setup_ssh_conf_hashknownhosts: true   # Requires: setup_ssh_conf: true
 setup_dotfiles: false
 setup_iterm2: false
 setup_espanso: false

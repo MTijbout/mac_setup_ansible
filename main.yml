@@ -12,7 +12,7 @@
   tasks:
     - name: Run SSH Setup
       ansible.builtin.include_tasks: tasks/ssh_github.yml
-      when: setup_ssh
+      when: setup_ssh_github
 
     - name: Run Homebrew Installation
       ansible.builtin.include_tasks: tasks/homebrew.yml
@@ -33,3 +33,7 @@
     - name: Run espanso Configuration
       ansible.builtin.include_tasks: tasks/espanso.yml
       when: setup_espanso
+
+    - name: Run SSH Configuration
+      ansible.builtin.include_tasks: tasks/ssh_config.yml
+      when: setup_ssh_conf
