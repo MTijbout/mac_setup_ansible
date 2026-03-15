@@ -1,11 +1,12 @@
 # vars.yml
 # --- Feature Toggles ---
 setup_ssh: false
-setup_homebrew: true
-setup_vscode: false
+setup_homebrew: false
+setup_vscode: true
+setup_vscode_as_default_md: true      # Requires: setup_vscode: true
 setup_dotfiles: false
 setup_iterm2: false
-setup_espanso: true
+setup_espanso: false
 
 # --- Global Config ---
 ssh_key_path: "{{ ansible_facts['env']['HOME'] }}/.ssh/id_github_mtijbout_sparky_user_auth"
@@ -60,3 +61,10 @@ dotfiles_to_link:
 iterm_files_to_link: 
   - com.googlecode.iterm2.plist
   - black_paper.jpg
+
+vscode_default_handler:
+  - md
+  - public.json # UTI: JSON (more reliable than just 'json')
+  - public.yaml # UTI: YAML (more reliable than just 'yaml')
+  - yml
+  

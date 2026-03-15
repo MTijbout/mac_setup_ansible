@@ -21,3 +21,24 @@
     dest: "{{ vscode_config_dir }}/settings.json"
     state: link
     force: yes
+
+- name: Configure VS Code as default for Markdown
+  block:
+    - name: Ensure duti is installed
+      community.general.homebrew:
+        name: duti
+        state: present
+
+    # - name: Set VS Code as default handler for .md files
+    #   ansible.builtin.command:
+    #     cmd: duti -s com.microsoft.VSCode md all
+    #   changed_when: false
+
+    - name: Set VS Code as default for other text files
+      ansible.builtin.command:
+        cmd: "duti -s com.microsoft.VSCode {{ item }} all"
+      loop: "{{ vscode_default_handler }}"
+      changed_when: false
+      
+  # This block only runs if your variable is true
+  when: setup_vscode_as_default_md | default(false) | bool
