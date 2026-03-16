@@ -1,5 +1,5 @@
+---
 # ./tasks/espanso.yml
-
 - name: 0. Stop Espanso service before changes
   ansible.builtin.shell: espanso stop
   failed_when: false # Don't fail if espanso isn't already running

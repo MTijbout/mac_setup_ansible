@@ -28,7 +28,8 @@
       src: "{{ vscode_settings_file }}"
       dest: "{{ vscode_config_dir }}/settings.json"
       state: link
-      force: yes
+      force: true
+      mode: '0644'
   # This block only runs if your variable is true
   when: setup_vscode_user_settings | default(false) | bool  
 
@@ -39,11 +40,6 @@
       community.general.homebrew:
         name: duti
         state: present
-
-    # - name: Set VS Code as default handler for .md files
-    #   ansible.builtin.command:
-    #     cmd: duti -s com.microsoft.VSCode md all
-    #   changed_when: false
 
     - name: Set VS Code as default for other text files
       ansible.builtin.command:

@@ -8,13 +8,17 @@
         state: directory
         mode: '0700'
 
-    - name: Set HashKnownHosts in user ssh_config
+    - name: Ensure HashKnownHosts is set inside the Host * block
       ansible.builtin.lineinfile:
         path: "{{ ansible_facts['user_dir'] }}/.ssh/config"
-        # Regex finds the line whether it's commented out or set to 'no'
+        # 1. Look for the start of the 'Host *' block
+        insertafter: '^Host \*'
+        # 2. Match any existing HashKnownHosts line (indented or commented)
         regexp: '^[#\s]*HashKnownHosts\s+'
-        line: 'HashKnownHosts yes'
-        create: true
+        # 3. Ensure it is indented with two spaces
+        line: '  HashKnownHosts yes'
+        create: yes
         mode: '0600'
+
   # This block only runs if your variable is true
   when: setup_ssh_conf_hashknownhosts | default(false) | bool

@@ -2,7 +2,7 @@
 # --- Feature Toggles ---
 setup_ssh_github: false
 setup_homebrew: false
-setup_vscode: true
+setup_vscode: false
 setup_vscode_extensions: true         # Requires: setup_vscode: true
 setup_vscode_file_handling: true      # Requires: setup_vscode: true
 setup_vscode_user_settings: true      # Requires: setup_vscode: true
