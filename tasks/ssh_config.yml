@@ -8,6 +8,17 @@
         state: directory
         mode: '0700'
 
+    - name: Ensure Host * header exists
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh/config"
+        line: 'Host *'
+        state: present
+        create: yes
+        mode: '0600'
+        # Ensures 'Host *' is at the very top if created, 
+        # or stays where it is if it already exists.
+        insertbefore: BOF 
+
     - name: Ensure HashKnownHosts is set inside the Host * block
       ansible.builtin.lineinfile:
         path: "{{ ansible_facts['user_dir'] }}/.ssh/config"
