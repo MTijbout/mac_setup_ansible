@@ -1,9 +1,9 @@
 # vars.yml
 # --- Tasks and Application Configuration Toggles ---
-setup_ssh_github: true
-setup_homebrew: false
-setup_app_conf: true
-setup_dotfiles: true
+setup_ssh_github: false
+setup_homebrew: true
+setup_app_conf: false
+setup_dotfiles: false
 
 # VS Code Configuration. Requires: setup_app_conf: true
 setup_vscode_extensions: true
@@ -58,6 +58,7 @@ homebrew_casks:
   - visual-studio-code
   - google-chrome
   - font-jetbrains-mono
+  - node
   - obsidian
 
 # VS Code Extensions
