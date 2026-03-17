@@ -1,0 +1,258 @@
+# Retrieve Configuration Repository.
+- name: Retrieve Configuration Repository
+  block:
+  - name: Ensure GitHub base directory exists for cloning repos.
+    ansible.builtin.file:
+      path: "{{ github_base_dir }}"
+      state: directory
+      mode: '0755'
+
+  - name: Manage and clone private configurations repository
+    ansible.builtin.git:
+      repo: "{{ configs_repo }}"
+      dest: "{{ configs_dest }}"
+      accept_hostkey: yes
+      key_file: "{{ ssh_key_path }}"
+      update: yes
+      force: no  # Explicitly do not overwrite local changes
+
+  rescue:
+    - name: Handle local modifications error
+      ansible.builtin.fail:
+        msg: |
+          ACTION REQUIRED: The repository at '/Users/mtijbout/GitHub/configurations' has local changes.
+          Ansible cannot update it without overwriting your work. 
+          Please commit, stash, or reset your changes manually before running this playbook again.
+      when: "'Local modifications exist' in ansible_failed_result.msg"
+
+    - name: Fail for any other reason
+      ansible.builtin.fail:
+        msg: "The git task failed with an unexpected error: {{ ansible_failed_result.msg }}"
+      when: "'Local modifications exist' not in ansible_failed_result.msg"
+
+# ---------------------------------------------------------------------------- #
+# Application-Specific Configurations
+
+
+# Espanso Configuration
+- name: Run Espanso Configuration
+  block:
+  - name: 0. Stop Espanso service before changes
+    ansible.builtin.shell: espanso stop
+    failed_when: false # Don't fail if espanso isn't already running
+    changed_when: false
+
+  - name: 1. Check if Dropbox folder is accessible
+    ansible.builtin.stat:
+      path: "{{ espanso_dropbox_path }}"
+    register: dropbox_folder
+
+  - name: 2. Verify Dropbox folder exists
+    ansible.builtin.assert:
+      that:
+        - dropbox_folder.stat.exists
+        - dropbox_folder.stat.isdir
+      fail_msg: "Dropbox folder at {{ espanso_dropbox_path }} is missing."
+
+  - name: 2b. Check if the local config is already a symlink
+    ansible.builtin.stat:
+      path: "{{ espanso_macos_config_path }}"
+    register: local_config
+
+  - name: 2c. Remove existing local config directory if it's NOT a link
+    ansible.builtin.file:
+      path: "{{ espanso_macos_config_path }}"
+      state: absent
+    # Only delete if it exists and is a real directory (not a symlink)
+    when: 
+      - local_config.stat.exists 
+      - not local_config.stat.islnk
+
+  - name: 3. Create symbolic link for Espanso config
+    ansible.builtin.file:
+      src: "{{ espanso_dropbox_path }}"
+      dest: "{{ espanso_macos_config_path }}"
+      state: link
+      force: true
+    register: symlink_status
+
+  - name: 4. Restart Espanso to apply changes
+    ansible.builtin.shell: espanso start
+    register: espanso_start_result
+    until: espanso_start_result.rc == 0
+    retries: 3
+    delay: 5
+  # The 'until' loop gives you time to click 'OK' on any remaining popups
+
+  # This block only runs if your variable is true
+  when: setup_espanso | default(false) | bool 
+
+
+# ---------------------------------------------------------------------------- #
+# iTerm2 Configuration
+- name: Run iTerm2 Configuration
+  block:
+  - name: Quit iTerm2 to allow preference syncing
+    ansible.builtin.shell: osascript -e 'quit app "iTerm"'
+    failed_when: false # Don't fail if iTerm wasn't running
+    changed_when: false
+
+  - name: Ensure iTerm2 configuration directory exists
+    ansible.builtin.file:
+      path: "{{ iterm_config_dir }}"
+      state: directory
+      mode: '0755'
+
+  - name: Symlink files to config path
+    ansible.builtin.file:
+      src: "{{ iterm_repo_src }}/{{ item }}"
+      dest: "{{ iterm_config_dir }}/{{ item }}"
+      state: link
+      force: true
+    loop: "{{ iterm_files_to_link }}"
+
+  - name: Enable loading preferences from custom folder
+    community.general.osx_defaults:
+      domain: com.googlecode.iterm2
+      key: LoadPrefsFromCustomFolder
+      type: bool
+      value: true
+
+  - name: Set path for custom preferences folder
+    community.general.osx_defaults:
+      domain: com.googlecode.iterm2
+      key: PrefsCustomFolder
+      type: string
+      value: "{{ iterm_config_dir }}"
+
+  # This block only runs if your variable is true
+  when: setup_iterm2 | default(false) | bool 
+
+# ---------------------------------------------------------------------------- #
+# VS Code - Extensions
+- name: Install VS Code extensions
+  block:
+    - name: Install Visual Studio Code extensions
+      ansible.builtin.shell:
+        cmd: "'/Applications/Visual Studio Code.app/Contents/Resources/app/bin/code' --install-extension {{ item }}"
+      loop: "{{ vscode_extensions }}"
+      register: vscode_result
+      changed_when: "'successfully installed' in vscode_result.stdout"
+      failed_when: 
+        - vscode_result.rc != 0 
+        - "'already installed' not in vscode_result.stdout"
+  # This block only runs if your variable is true
+  when: setup_vscode_extensions | default(false) | bool
+
+# VS Code - User Settings
+- name: Configure VS Code User Settings
+  block:
+  - name: Ensure VS Code User configuration directory exists
+    ansible.builtin.file:
+      path: "{{ vscode_config_dir }}"
+      state: directory
+      mode: '0755'
+  
+  - name: Symlink VS Code settings.json
+    ansible.builtin.file:
+      # UPDATED: We now use the variable directly since it contains the full path
+      src: "{{ vscode_settings_file }}"
+      dest: "{{ vscode_config_dir }}/settings.json"
+      state: link
+      force: true
+      mode: '0644'
+  # This block only runs if your variable is true
+  when: setup_vscode_user_settings | default(false) | bool  
+
+# VS Code - File Handling
+- name: Configure VS Code as default for Markdown
+  block:
+    - name: Ensure duti is installed
+      community.general.homebrew:
+        name: duti
+        state: present
+
+    - name: Set VS Code as default for other text files
+      ansible.builtin.command:
+        cmd: "duti -s com.microsoft.VSCode {{ item }} all"
+      loop: "{{ vscode_file_handling }}"
+      changed_when: false
+      
+  # This block only runs if your variable is true
+  when: setup_vscode_file_handling | default(false) | bool  
+
+# ---------------------------------------------------------------------------- #
+# SSH Client Configuration
+
+# Configure user-specific SSH HashKnownHosts setting.
+- name: Configure user-specific SSH HashKnownHosts
+  block:
+    - name: Ensure ~/.ssh directory exists with correct permissions
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh"
+        state: directory
+        mode: '0700'
+
+    - name: Ensure Host * header exists
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh/config"
+        line: 'Host *'
+        state: present
+        create: yes
+        mode: '0600'
+        # Ensures 'Host *' is at the very top if created, 
+        # or stays where it is if it already exists.
+        insertbefore: BOF 
+
+    - name: Ensure HashKnownHosts is set inside the Host * block
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh/config"
+        # 1. Look for the start of the 'Host *' block
+        insertafter: '^Host \*'
+        # 2. Match any existing HashKnownHosts line (indented or commented)
+        regexp: '^[#\s]*HashKnownHosts\s+'
+        # 3. Ensure it is indented with two spaces
+        line: '  HashKnownHosts yes'
+        create: yes
+        mode: '0600'
+
+  # This block only runs if your variable is true
+  when: setup_ssh_conf_hashknownhosts | default(false) | bool
+
+# Add hashed hostnames to known_hosts from private GitHub
+- name: Manage hashed hostnames from private GitHub
+  block:
+    - name: Ensure the local .ssh directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh"
+        state: directory
+        mode: '0700'
+
+    - name: Identify relevant text files
+      ansible.builtin.find:
+        paths: "{{ configs_dest }}/ssh"
+        patterns: "known_hosts.*"
+      register: found_files
+
+    - name: Ensure all hashed blocks are in known_hosts (single block)
+      ansible.builtin.blockinfile:
+        path: "{{ known_hosts_file }}"
+        # This joins the content of all found files into one block
+        block: |
+          {% for file in found_files.files %}
+          {{ lookup('file', file.path) }}
+          {% endfor %}
+        marker: "# {mark} ANSIBLE MANAGED SSH HOSTS"
+        create: yes
+        mode: '0600'
+      when: found_files.matched > 0
+
+    - name: Fail if no hostname files were found
+      ansible.builtin.debug:
+        msg: "No files matching the naming convention were found in {{ configs_dest }}."
+      when: found_files.matched == 0
+
+  vars:
+    # temp_clone_path: "/tmp/known_hosts_fragments"
+    known_hosts_file: "{{ ansible_facts['user_dir'] }}/.ssh/known_hosts"
+  when: setup_ssh_conf_hashknownhosts | default(false) | bool

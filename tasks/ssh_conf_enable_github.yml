@@ -1,13 +1,13 @@
-- name: Ensure SSH directory exists
+- name: Ensure SSH directory exists with correct permissions.
   ansible.builtin.file:
-    path: "{{ ansible_facts['env']['HOME'] }}/.ssh"
+    path: "{{ ansible_facts['user_dir'] }}/.ssh"
     state: directory
     mode: '0700'
 
-- name: Configure SSH to use macOS Keychain
+- name: Configure SSH conf file for GitHub andto use macOS Keychain
   ansible.builtin.blockinfile:
-    path: "{{ ansible_facts['env']['HOME'] }}/.ssh/config"
-    create: yes
+    path: "{{ ansible_facts['user_dir'] }}/.ssh/config"
+    create: true
     mode: '0600'
     block: |
       Host github.com
@@ -15,7 +15,7 @@
         UseKeychain yes
         IdentityFile {{ ssh_key_path }}
 
-- name: Check if SSH key exists
+- name: Check if SSH key exists in the .ssh folder.
   ansible.builtin.stat:
     path: "{{ ssh_key_path }}"
   register: ssh_key_stat

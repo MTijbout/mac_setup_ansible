@@ -1,0 +1,85 @@
+# tasks/ssh_config.yml
+---
+- name: Configure user-specific SSH HashKnownHosts
+  block:
+    - name: Ensure ~/.ssh directory exists with correct permissions
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh"
+        state: directory
+        mode: '0700'
+
+    - name: Ensure Host * header exists
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh/config"
+        line: 'Host *'
+        state: present
+        create: yes
+        mode: '0600'
+        # Ensures 'Host *' is at the very top if created, 
+        # or stays where it is if it already exists.
+        insertbefore: BOF 
+
+    - name: Ensure HashKnownHosts is set inside the Host * block
+      ansible.builtin.lineinfile:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh/config"
+        # 1. Look for the start of the 'Host *' block
+        insertafter: '^Host \*'
+        # 2. Match any existing HashKnownHosts line (indented or commented)
+        regexp: '^[#\s]*HashKnownHosts\s+'
+        # 3. Ensure it is indented with two spaces
+        line: '  HashKnownHosts yes'
+        create: yes
+        mode: '0600'
+
+  # This block only runs if your variable is true
+  when: setup_ssh_conf_hashknownhosts | default(false) | bool
+
+
+
+- name: Manage hashed hostnames from private GitHub
+  # hosts: localhost
+  vars:
+    git_repo_url: "git@github.com:your-org/your-private-repo.git"
+    temp_clone_path: "/tmp/known_hosts_fragments"
+    known_hosts_file: "{{ ansible_facts['user_dir'] }}/.ssh/known_hosts"
+
+- name: Configure user-specific SSH HashedKnownHosts
+  block:
+    - name: Ensure the local .ssh directory exists
+      ansible.builtin.file:
+        path: "{{ ansible_facts['user_dir'] }}/.ssh"
+        state: directory
+        mode: '0700'
+
+    - name: Clone private GitHub repository
+      ansible.builtin.git:
+        repo: "{{ git_repo_url }}"
+        dest: "{{ temp_clone_path }}"
+        accept_hostkey: yes
+        # Use key_file if your SSH key isn't in the default agent
+        # key_file: "~/.ssh/id_rsa_github"
+
+    - name: Identify relevant text files
+      ansible.builtin.find:
+        paths: "{{ temp_clone_path }}"
+        patterns: "known_hosts.*"
+      register: found_files
+
+    - name: Ensure hashed blocks are in known_hosts
+      ansible.builtin.blockinfile:
+        path: "{{ known_hosts_file }}"
+        block: "{{ lookup('file', item.path) }}"
+        marker: "# {mark} ANSIBLE MANAGED HOST: {{ item.path | basename }}"
+        create: yes
+        mode: '0600'
+      loop: "{{ found_files.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
+
+    - name: Fail if no hostname files were found
+      ansible.builtin.fail:
+        msg: "No files matching the naming convention were found in {{ temp_clone_path }}."
+      when: found_files.matched == 0
+
+  # This block only runs if your variable is true
+  when: setup_ssh_conf_hashknownhosts | default(false) | bool

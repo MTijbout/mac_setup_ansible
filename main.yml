@@ -10,8 +10,8 @@
     - vars.yml
 
   tasks:
-    - name: Run SSH Setup
-      ansible.builtin.include_tasks: tasks/ssh_github.yml
+    - name: Run SSH Setup and enable GitHub Access
+      ansible.builtin.include_tasks: tasks/ssh_conf_enable_github.yml
       when: setup_ssh_github
 
     - name: Run Homebrew Installation
@@ -22,18 +22,24 @@
       ansible.builtin.include_tasks: tasks/symlinks_dotfiles.yml
       when: setup_dotfiles
 
-    - name: Run VS Code Configuration
-      ansible.builtin.include_tasks: tasks/vscode.yml
-      when: setup_vscode
+    - name: Run Application Configuration
+      ansible.builtin.include_tasks: tasks/app_conf.yml
+      when: setup_app_conf
 
-    - name: Run iTerm2 Configuration
-      ansible.builtin.include_tasks: tasks/iterm2.yml
-      when: setup_iterm2
+# ---------------------------------------------------------------------------- #
 
-    - name: Run espanso Configuration
-      ansible.builtin.include_tasks: tasks/espanso.yml
-      when: setup_espanso
+    # - name: Run VS Code Configuration
+    #   ansible.builtin.include_tasks: tasks/vscode.yml
+    #   when: setup_vscode
 
-    - name: Run SSH Configuration
-      ansible.builtin.include_tasks: tasks/ssh_config.yml
-      when: setup_ssh_conf
+    # - name: Run iTerm2 Configuration
+    #   ansible.builtin.include_tasks: tasks/iterm2.yml
+    #   when: setup_iterm2
+
+    # - name: Run espanso Configuration
+    #   ansible.builtin.include_tasks: tasks/espanso.yml
+    #   when: setup_espanso
+
+    # - name: Run SSH Client Configuration
+    #   ansible.builtin.include_tasks: tasks/ssh_client_config.yml
+    #   when: setup_ssh_conf

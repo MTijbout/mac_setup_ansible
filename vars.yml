@@ -1,47 +1,57 @@
 # vars.yml
-# --- Feature Toggles ---
-setup_ssh_github: false
+# --- Tasks and Application Configuration Toggles ---
+setup_ssh_github: true
 setup_homebrew: false
-setup_vscode: false
-setup_vscode_extensions: true         # Requires: setup_vscode: true
-setup_vscode_file_handling: true      # Requires: setup_vscode: true
-setup_vscode_user_settings: true      # Requires: setup_vscode: true
+setup_app_conf: true
+setup_dotfiles: true
+
+# VS Code Configuration. Requires: setup_app_conf: true
+setup_vscode_extensions: true
+setup_vscode_user_settings: false
+setup_vscode_file_handling: true
+# SSH Client Configuration. Requires: setup_app_conf: true
 setup_ssh_conf: true
 setup_ssh_conf_hashknownhosts: true   # Requires: setup_ssh_conf: true
-setup_dotfiles: false
+# iTerm2 Configuration. Requires: setup_app_conf: true
 setup_iterm2: false
+# espanso Configuration. Requires: setup_app_conf: true
 setup_espanso: false
 
-# --- Global Config ---
-ssh_key_path: "{{ ansible_facts['env']['HOME'] }}/.ssh/id_github_mtijbout_sparky_user_auth"
+# --- GitHub Repository Details ---
+# SSH key for accessing (private) GitHub repositories
+ssh_key_path: "{{ ansible_facts['user_dir'] }}/.ssh/id_github_mtijbout_sparky_user_auth"
 
 # Base directory for all repos
-github_base_dir: "{{ ansible_facts['env']['HOME'] }}/GitHub"
+github_base_dir: "{{ ansible_facts['user_dir'] }}/GitHub"
 
-# Repository Destinations (dotfiles repo)
+# --- Repositories and Destinations ---
+# Dotfiles Repository
 dotfiles_repo: "git@github.com:MTijbout/dotfiles.git"
 dotfiles_dest: "{{ github_base_dir }}/dotfiles"
 
+# Configurations Repository
 configs_repo: "git@github.com:MTijbout/configurations.git"
 configs_dest: "{{ github_base_dir }}/configurations"
 
+# --- Application-Specific Variables ---
 # Config Sources (configurations repo)
 
 # VScode
-vscode_config_dir: "{{ ansible_facts['env']['HOME'] }}/Library/Application Support/Code/User"
+vscode_config_dir: "{{ ansible_facts['user_dir'] }}/Library/Application Support/Code/User"
 vscode_settings_file: "{{ configs_dest }}/vscode/settings.json"
 
 # iTerm2
-iterm_config_dir: "{{ ansible_facts['env']['HOME'] }}/.config/iterm2"
+iterm_config_dir: "{{ ansible_facts['user_dir'] }}/.config/iterm2"
 iterm_config_file: "com.googlecode.iterm2.plist"
 iterm_background_file: "black_paper.jpg"
 iterm_repo_src: "{{ configs_dest }}/iterm2/"
 
 # espanso (Dropbox)
-espanso_dropbox_path: "{{ ansible_facts['env']['HOME'] }}/Dropbox/espanso"
-espanso_macos_config_path: "{{ ansible_facts['env']['HOME'] }}/Library/Application Support/espanso"
+espanso_dropbox_path: "{{ ansible_facts['user_dir'] }}/Dropbox/espanso"
+espanso_macos_config_path: "{{ ansible_facts['user_dir'] }}/Library/Application Support/espanso"
 
-
+# --- Lists for Looping ---
+# Homebrew
 homebrew_casks: 
   - espanso
   - iterm2
@@ -50,22 +60,26 @@ homebrew_casks:
   - font-jetbrains-mono
   - obsidian
 
+# VS Code Extensions
 vscode_extensions: 
   - redhat.ansible
   - ms-python.python
   - eamodio.gitlens
   - esbenp.prettier-vscode
 
+# Dotfiles to Symlink
 dotfiles_to_link: 
   - .aliases-darwin
   - .vimrc
   - .gitconfig
   - .gitignore_global
 
+# iTerm2 files to symlink
 iterm_files_to_link: 
   - com.googlecode.iterm2.plist
   - black_paper.jpg
 
+# VS Code - File Handling
 vscode_file_handling:
   - md
   - public.json # UTI: JSON (more reliable than just 'json')

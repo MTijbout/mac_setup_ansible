@@ -1,4 +1,4 @@
-- name: Ensure GitHub directory exists
+- name: Ensure GitHub base directory exists for cloning repos.
   ansible.builtin.file:
     path: "{{ github_base_dir }}"
     state: directory
@@ -8,14 +8,6 @@
   ansible.builtin.git:
     repo: "{{ dotfiles_repo }}"
     dest: "{{ dotfiles_dest }}"
-    accept_hostkey: yes
-    key_file: "{{ ssh_key_path }}"
-    update: yes
-
-- name: Clone private configurations repository
-  ansible.builtin.git:
-    repo: "{{ configs_repo }}"
-    dest: "{{ configs_dest }}"
     accept_hostkey: yes
     key_file: "{{ ssh_key_path }}"
     update: yes
