@@ -67,6 +67,7 @@ vscode_extensions:
   - ms-python.python
   - eamodio.gitlens
   - esbenp.prettier-vscode
+  - pomdtr.excalidraw-editor
 
 # Dotfiles to Symlink
 dotfiles_to_link: 
