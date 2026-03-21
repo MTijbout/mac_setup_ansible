@@ -1,11 +1,19 @@
+---
+# tasks/homebrew.yml
+
+- name: Install Homebrew Formulas
+  community.general.homebrew:
+    name: "{{ item }}"
+    state: present
+  loop: "{{ homebrew_packages }}"
+  when: homebrew_packages is defined and homebrew_packages | length > 0
+
 - name: Install Homebrew Casks
   community.general.homebrew_cask:
     name: "{{ item }}"
     state: present
     accept_external_apps: true
   loop: "{{ homebrew_casks }}"
+  when: homebrew_casks is defined and homebrew_casks | length > 0
 
-- name: Install JetBrains Mono Font
-  community.general.homebrew_cask:
-    name: font-jetbrains-mono
-    state: present
+  

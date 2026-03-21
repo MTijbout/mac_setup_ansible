@@ -1,0 +1,23 @@
+---
+# tasks/dock.yml
+# Manages the macOS Dock — adds applications with optional positioning.
+
+- name: Ensure dockutil is installed
+  community.general.homebrew:
+    name: dockutil
+    state: present
+  tags: dock
+
+- name: Add applications to Dock
+  ansible.builtin.include_tasks: dock_add_item.yml
+  loop: "{{ dock_apps }}"
+  loop_control:
+    loop_var: dock_item
+    label: "{{ dock_item.label }}"
+  tags: dock
+
+- name: Restart Dock to apply changes
+  ansible.builtin.command:
+    cmd: killall Dock
+  changed_when: true
+  tags: dock

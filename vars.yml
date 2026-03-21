@@ -16,6 +16,8 @@ setup_ssh_conf_hashknownhosts: true   # Requires: setup_ssh_conf: true
 setup_iterm2: false
 # espanso Configuration. Requires: setup_app_conf: true
 setup_espanso: false
+# Dock Configuration
+setup_dock: true
 
 # --- GitHub Repository Details ---
 # SSH key for accessing (private) GitHub repositories
@@ -50,16 +52,44 @@ iterm_repo_src: "{{ configs_dest }}/iterm2/"
 espanso_dropbox_path: "{{ ansible_facts['user_dir'] }}/Dropbox/espanso"
 espanso_macos_config_path: "{{ ansible_facts['user_dir'] }}/Library/Application Support/espanso"
 
+# Apps to add to the Dock (in order)
+# - Options: position, after, before (omit for end)
+# - Values: beginning, end, middle, <numeric index>, or <label>
+dock_apps:
+  - label: "Obsidian"
+    path: "/Applications/Obsidian.app"
+    position_type: "position"   
+    position_value: "1"
+
+  - label: "Google Chrome"
+    path: "/Applications/Google Chrome.app"
+    position_type: "after"
+    position_value: "Obsidian"
+
+  - label: "Visual Studio Code"
+    path: "/Applications/Visual Studio Code.app"
+    position_type: "after"
+    position_value: "Google Chrome"
+
+  - label: "iTerm"
+    path: "/Applications/iTerm.app"
+    position_type: "after"
+    position_value: "Visual Studio Code"
+
 # --- Lists for Looping ---
-# Homebrew
+# Homebrew Casks (GUI applications)
 homebrew_casks: 
   - espanso
   - iterm2
   - visual-studio-code
   - google-chrome
   - font-jetbrains-mono
-  - node
   - obsidian
+
+# Homebrew Formulas (CLI tools)
+homebrew_packages:
+  - dockutil
+  - node
 
 # VS Code Extensions
 vscode_extensions: 

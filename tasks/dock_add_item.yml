@@ -1,0 +1,25 @@
+---
+# tasks/dock_add_item.yml
+# Called by dock.yml for each entry in dock_apps.
+
+- name: Build position argument for "{{ dock_item.label }}"
+  ansible.builtin.set_fact:
+    _dock_position_arg: >-
+      {%- if dock_item.position_type is defined and dock_item.position_value is defined -%}
+        --{{ dock_item.position_type }} '{{ dock_item.position_value }}'
+      {%- else -%}
+        --position end
+      {%- endif -%}
+
+- name: Add "{{ dock_item.label }}" to Dock
+  ansible.builtin.command:
+    cmd: >
+      dockutil --add '{{ dock_item.path }}'
+      --label '{{ dock_item.label }}'
+      {{ _dock_position_arg }}
+      --no-restart
+  register: dockutil_result
+  changed_when: "'was not added' not in dockutil_result.stdout"
+  failed_when:
+    - dockutil_result.rc != 0
+    - "'already exists in dock' not in dockutil_result.stdout"

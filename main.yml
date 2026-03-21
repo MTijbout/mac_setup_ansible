@@ -26,6 +26,9 @@
       ansible.builtin.include_tasks: tasks/app_conf.yml
       when: setup_app_conf
 
+    - name: Run Dock Configuration
+      ansible.builtin.include_tasks: tasks/dock.yml
+      when: setup_dock
 # ---------------------------------------------------------------------------- #
 
     # - name: Run VS Code Configuration
