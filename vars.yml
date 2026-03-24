@@ -11,7 +11,7 @@ setup_vscode_user_settings: false
 setup_vscode_file_handling: true
 # SSH Client Configuration. Requires: setup_app_conf: true
 setup_ssh_conf: true
-setup_ssh_conf_hashknownhosts: true   # Requires: setup_ssh_conf: true
+setup_ssh_conf_hashknownhosts: true # Requires: setup_ssh_conf: true
 # iTerm2 Configuration. Requires: setup_app_conf: true
 setup_iterm2: false
 # espanso Configuration. Requires: setup_app_conf: true
@@ -58,7 +58,7 @@ espanso_macos_config_path: "{{ ansible_facts['user_dir'] }}/Library/Application 
 dock_apps:
   - label: "Obsidian"
     path: "/Applications/Obsidian.app"
-    position_type: "position"   
+    position_type: "position"
     position_value: "1"
 
   - label: "Google Chrome"
@@ -78,7 +78,7 @@ dock_apps:
 
 # --- Lists for Looping ---
 # Homebrew Casks (GUI applications)
-homebrew_casks: 
+homebrew_casks:
   - espanso
   - iterm2
   - visual-studio-code
@@ -93,7 +93,7 @@ homebrew_packages:
   - node
 
 # VS Code Extensions
-vscode_extensions: 
+vscode_extensions:
   - redhat.ansible
   - ms-python.python
   - eamodio.gitlens
@@ -101,14 +101,14 @@ vscode_extensions:
   - pomdtr.excalidraw-editor
 
 # Dotfiles to Symlink
-dotfiles_to_link: 
+dotfiles_to_link:
   - .aliases-darwin
   - .vimrc
   - .gitconfig
   - .gitignore_global
 
 # iTerm2 files to symlink
-iterm_files_to_link: 
+iterm_files_to_link:
   - com.googlecode.iterm2.plist
   - black_paper.jpg
 
