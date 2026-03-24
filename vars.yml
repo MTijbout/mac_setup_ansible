@@ -85,6 +85,7 @@ homebrew_casks:
   - google-chrome
   - font-jetbrains-mono
   - obsidian
+  - signal
 
 # Homebrew Formulas (CLI tools)
 homebrew_packages:
