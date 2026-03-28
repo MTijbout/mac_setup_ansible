@@ -45,6 +45,8 @@ ansible-playbook main.yml
   - `homebrew.yml` — Installs applications via Homebrew casks
   - `symlinks_dotfiles.yml` — Clones private dotfiles repo and symlinks shell configs
   - `app_conf.yml` — Pulls configurations repo and manages app-specific setup (VS Code, iTerm2, Espanso, SSH client config)
+  - `create_folders.yml` — Creates directories listed in `directories_to_create`
+  - `create_links.yml` — Creates symlinks listed in `symlinks_to_create`
 
 ## Customization
 
@@ -55,6 +57,8 @@ setup_ssh_github: false    # Configure SSH key for GitHub access
 setup_homebrew: true       # Install Homebrew casks
 setup_app_conf: false      # Run application configurations
 setup_dotfiles: false      # Clone and symlink dotfiles
+setup_create_folders: false  # Create directories from directories_to_create
+setup_create_links: false    # Create symlinks from symlinks_to_create
 ```
 
 When `setup_app_conf` is enabled, additional toggles control sub-tasks:
@@ -78,6 +82,36 @@ setup_espanso: false               # Symlink Espanso config from Dropbox
 - font-jetbrains-mono
 - node
 - obsidian
+
+## Creating Folders and Symlinks
+
+To create specific directories on a new machine, add them to `directories_to_create` in `vars.yml` and enable `setup_create_folders`:
+
+```yaml
+setup_create_folders: true
+
+directories_to_create:
+  - "{{ ansible_facts['user_dir'] }}/Projects"
+  - "{{ ansible_facts['user_dir'] }}/Work/clients"
+```
+
+To create symlinks, add entries to `symlinks_to_create` and enable `setup_create_links`. Two patterns are supported:
+
+```yaml
+setup_create_links: true
+
+symlinks_to_create:
+  # Pattern 1: explicit full destination path (custom link name)
+  - src: "{{ ansible_facts['user_dir'] }}/Dropbox/notes"
+    dest: "{{ ansible_facts['user_dir'] }}/Documents/notes"
+
+  # Pattern 2: place link in a directory, link name = source basename
+  # Result: ~/Projects/dotfiles -> /Volumes/Backup/dotfiles
+  - src: /Volumes/Backup/dotfiles
+    dest_dir: "{{ ansible_facts['user_dir'] }}/Projects"
+```
+
+When using `dest_dir`, the directory is created automatically if it does not exist.
 
 ## Maintenance
 

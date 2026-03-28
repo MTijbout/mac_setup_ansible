@@ -29,6 +29,14 @@
     - name: Run Dock Configuration
       ansible.builtin.include_tasks: tasks/dock.yml
       when: setup_dock
+
+    - name: Run Folder Creation
+      ansible.builtin.include_tasks: tasks/create_folders.yml
+      when: setup_create_folders
+
+    - name: Run Symlink Creation
+      ansible.builtin.include_tasks: tasks/create_links.yml
+      when: setup_create_links
 # ---------------------------------------------------------------------------- #
 
     # - name: Run VS Code Configuration

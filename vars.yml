@@ -1,7 +1,7 @@
 # vars.yml
 # --- Tasks and Application Configuration Toggles ---
 setup_ssh_github: false
-setup_homebrew: true
+setup_homebrew: false
 setup_app_conf: false
 setup_dotfiles: false
 
@@ -10,14 +10,26 @@ setup_vscode_extensions: true
 setup_vscode_user_settings: false
 setup_vscode_file_handling: true
 # SSH Client Configuration. Requires: setup_app_conf: true
-setup_ssh_conf: true
+setup_ssh_conf: false
 setup_ssh_conf_hashknownhosts: true # Requires: setup_ssh_conf: true
 # iTerm2 Configuration. Requires: setup_app_conf: true
 setup_iterm2: false
 # espanso Configuration. Requires: setup_app_conf: true
 setup_espanso: false
 # Dock Configuration
-setup_dock: true
+setup_dock: false
+setup_create_folders: false
+setup_create_links: false
+
+# --- Folders and Symlinks ---
+directories_to_create:
+  - "{{ ansible_facts['user_dir'] }}/Projects"
+
+symlinks_to_create:
+  - src: /path/to/source-file       # explicit full destination path
+    dest: "{{ ansible_facts['user_dir'] }}/link-name"
+  - src: /path/to/another-file      # link placed in dest_dir, named after source basename
+    dest_dir: "{{ ansible_facts['user_dir'] }}/Projects"
 
 # --- GitHub Repository Details ---
 # SSH key for accessing (private) GitHub repositories

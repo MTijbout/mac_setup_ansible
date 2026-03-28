@@ -1,0 +1,15 @@
+- name: Ensure symlink destination directories exist
+  ansible.builtin.file:
+    path: "{{ item.dest_dir }}"
+    state: directory
+    mode: '0755'
+  loop: "{{ symlinks_to_create }}"
+  when: item.dest_dir is defined
+
+- name: Create symlinks
+  ansible.builtin.file:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest | default(item.dest_dir + '/' + (item.src | basename)) }}"
+    state: link
+    force: yes
+  loop: "{{ symlinks_to_create }}"
