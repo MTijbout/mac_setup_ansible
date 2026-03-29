@@ -18,17 +18,21 @@ setup_iterm2: false
 setup_espanso: false
 # Dock Configuration
 setup_dock: false
-setup_create_folders: false
+setup_create_folders: true
 setup_create_links: true
 
 # --- Folders and Symlinks ---
+# directories_to_create supports two formats:
+#   - plain string (uses default mode 0755)
+#   - dict with path and optional mode: { path: "/some/dir", mode: "0700" }
 directories_to_create:
   - "{{ ansible_facts['user_dir'] }}/Documents/Links"
   - "{{ ansible_facts['user_dir'] }}/Development"
   - "{{ ansible_facts['user_dir'] }}/Docker"
   - "{{ ansible_facts['user_dir'] }}/GitHub"
   - "{{ ansible_facts['user_dir'] }}/Repository"
-
+  - path: "{{ ansible_facts['user_dir'] }}/Certificates"
+    mode: "0700"
 
 symlinks_to_create:
   # - src: /path/to/source-file       # explicit full destination path

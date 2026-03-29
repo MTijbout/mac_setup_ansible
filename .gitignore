@@ -1,5 +1,7 @@
 # .gitignore
 CLAUDE.md
+.claude
+.understand-anything
 .DS_Store
 *.retry
 *.log
