@@ -6,9 +6,9 @@ setup_app_conf: false
 setup_dotfiles: false
 
 # VS Code Configuration. Requires: setup_app_conf: true
-setup_vscode_extensions: true
+setup_vscode_extensions: false
 setup_vscode_user_settings: false
-setup_vscode_file_handling: true
+setup_vscode_file_handling: false
 # SSH Client Configuration. Requires: setup_app_conf: true
 setup_ssh_conf: false
 setup_ssh_conf_hashknownhosts: true # Requires: setup_ssh_conf: true
@@ -19,17 +19,38 @@ setup_espanso: false
 # Dock Configuration
 setup_dock: false
 setup_create_folders: false
-setup_create_links: false
+setup_create_links: true
 
 # --- Folders and Symlinks ---
 directories_to_create:
-  - "{{ ansible_facts['user_dir'] }}/Projects"
+  - "{{ ansible_facts['user_dir'] }}/Documents/Links"
+  - "{{ ansible_facts['user_dir'] }}/Development"
+  - "{{ ansible_facts['user_dir'] }}/Docker"
+  - "{{ ansible_facts['user_dir'] }}/GitHub"
+  - "{{ ansible_facts['user_dir'] }}/Repository"
+
 
 symlinks_to_create:
-  - src: /path/to/source-file       # explicit full destination path
-    dest: "{{ ansible_facts['user_dir'] }}/link-name"
-  - src: /path/to/another-file      # link placed in dest_dir, named after source basename
-    dest_dir: "{{ ansible_facts['user_dir'] }}/Projects"
+  # - src: /path/to/source-file       # explicit full destination path
+  #   dest: "{{ ansible_facts['user_dir'] }}/link-name"
+  # - src: /path/to/another-file      # link placed in dest_dir, named after source basename
+  #   dest_dir: "{{ ansible_facts['user_dir'] }}/Projects"
+  - src: "/Volumes/Data/Documents/Algemene Data"      # link placed in dest_dir, named after source basename
+    dest_dir: "{{ ansible_facts['user_dir'] }}/Documents/Links"
+  - src: "/Volumes/Data/Documents/Algemene Data/Facturen/2026"      # link placed in dest_dir, named after source basename
+    dest_dir: "{{ ansible_facts['user_dir'] }}/Documents/Links"
+  - src: "/Volumes/Data/Documents/Algemene Data/Fiscale Zaken"      # link placed in dest_dir, named after source basename
+    dest_dir: "{{ ansible_facts['user_dir'] }}/Documents/Links"
+  - src: "/Volumes/Data/HomeDirs/Documents - Marco"      # link placed in dest_dir, named after source basename
+    dest_dir: "{{ ansible_facts['user_dir'] }}/Documents/Links"
+  # Claude specific links.
+  - src: "/Users/mtijbout/Library/CloudStorage/GoogleDrive-marco@tijbout.com/My Drive/_.config/claude/.claude"      # link placed in dest_dir, named after source basename
+    dest_dir: "/Users/mtijbout/"
+  - src: "/Users/mtijbout/Library/CloudStorage/GoogleDrive-marco@tijbout.com/My Drive/_.config/claude/.claude.json"      # link placed in dest_dir, named after source basename
+    dest_dir: "/Users/mtijbout/"
+
+ 
+
 
 # --- GitHub Repository Details ---
 # SSH key for accessing (private) GitHub repositories
@@ -98,11 +119,13 @@ homebrew_casks:
   - font-jetbrains-mono
   - obsidian
   - signal
+  - spotify
 
 # Homebrew Formulas (CLI tools)
 homebrew_packages:
   - dockutil
   - node
+  - rsync
 
 # VS Code Extensions
 vscode_extensions:
@@ -118,6 +141,7 @@ dotfiles_to_link:
   - .vimrc
   - .gitconfig
   - .gitignore_global
+  - .osx
 
 # iTerm2 files to symlink
 iterm_files_to_link:
