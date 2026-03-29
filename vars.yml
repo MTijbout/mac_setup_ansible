@@ -6,7 +6,7 @@ setup_app_conf: false
 setup_dotfiles: false
 
 # VS Code Configuration. Requires: setup_app_conf: true
-setup_vscode_extensions: false
+setup_vscode_extensions: true
 setup_vscode_user_settings: false
 setup_vscode_file_handling: false
 # SSH Client Configuration. Requires: setup_app_conf: true
@@ -124,6 +124,7 @@ homebrew_casks:
   - obsidian
   - signal
   - spotify
+  - karabiner-elements
 
 # Homebrew Formulas (CLI tools)
 homebrew_packages:
@@ -138,6 +139,7 @@ vscode_extensions:
   - eamodio.gitlens
   - esbenp.prettier-vscode
   - pomdtr.excalidraw-editor
+  - ms-vscode-remote.remote-containers
 
 # Dotfiles to Symlink
 dotfiles_to_link:
